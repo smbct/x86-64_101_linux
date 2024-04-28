@@ -1,8 +1,11 @@
 asem.o: asem.s
 	as asem.s -o asem.o
 
-asem: asem.o
-	gcc -o asem -static asem.o
+merg_sort.o: merge_sort.s
+	as merge_sort.s -o merge_sort.o
+
+asem: asem.o merge_sort.o
+	gcc -o asem -static asem.o merge_sort.o
 
 asem_2.o: asem_2.s
 	as asem_2.s -o asem_2.o
