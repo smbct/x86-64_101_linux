@@ -1,10 +1,14 @@
-.global _start
+.global _start, debug
 .intel_syntax noprefix
 
-# compilation: as hellow_world.s -o hello_world.o
-# linking: gcc -static -nostdlib hello_wolrd.o -o hello_world
+# compilation: as hello_world.s -o hello_world.o
+# linking: gcc -static -nostdlib hello_world.o -o hello_world
 
 _start:
+
+    mov rax, 30
+    add rax, 12
+    debug:
 
     mov rax, 1
     mov rdi, 1
