@@ -1,130 +1,111 @@
-.global _start
+.global _start, debug
 .intel_syntax noprefix
 
-# compilation: as draw_circle.s -o draw_circle.o
-# linking: gcc -static -nostdlib draw_circle.o -o draw_circle
+# compilation: as draw_square.s -o draw_square.o
+# linking: gcc -static -nostdlib draw_square.o -o draw_square
 
 _start:
 
-    push rbp
     mov rbp, rsp
-    
-    sub rsp, 12
-    # local variables
-    # 4: (4) column_index
-    # 4: (8) row index
-    # 4: (12) square center
-    # 4: (16) squared radius
-    # 4: (20) temp_distance
+    sub rsp, 40
+    # row index : offset=8, size=8
+    # column index : offset=16, size=8
+    # square center : offset=24, size=8
+    # radius squared : offset=32, size=8
+    # distance squared : offset=40, size=8
 
-    # initialize the square center
-    mov ax, [rect_size]
-    shr ax
-    mov [rbp-12], ax
+    # rax is temporary used to compute square_size/2
+    mov rax, [square_size]
+    shr rax
+    # storing the value in the square center variable
+    mov qword ptr [rbp-24], rax
 
-    # inialize the radius and squared radius local variables
-    mov cx, [diameter]
-    shr cx
-    imul cx, cx
-    mov [rbp-16], cx
+    # rax is squared
+    imul rax, rax
+    # storing the squared radius
+    mov qword ptr [rbp-32], rax
 
-    # row index variable is initialized to 0
-    mov [rbp-8], word ptr 0
 
-    # loop on the rows
-   row_loop:
+    mov qword ptr [rbp-8], 0 # row index var is set to 0
+    for_loop_rows:    
 
-        # column index variable initialized to 0
-        mov [rbp-4], word ptr 0
+        mov qword ptr [rbp-16], 0 # col index var is set to 0
+        for_loop_columns:
 
-        # loop on the columns
-        column_loop:
+            # compute (row_index - square_center)² into distance_squared
+            mov rax, [rbp-8]
+            sub rax, [rbp-24]
+            imul rax, rax
+            mov [rbp-40], rax
 
-            # test if the current character is inside the circle
-            mov ax, [rbp-4]
-            sub ax, [rbp-12]
-            imul ax, ax
-            mov [rbp-20], ax
-            mov ax, [rbp-8]
-            sub ax, [rbp-12]
-            imul ax, ax
-            add [rbp-20], ax
-            mov ax, [rbp-20]
-            cmp ax, [rbp-16]
+            # add (col_index - square_center)² to distance_squared
+            mov rax, [rbp-16]
+            sub rax, [rbp-24]
+            imul rax, rax
+            add [rbp-40], rax
 
-            jge draw_space
+            # compare distance_squared to radius_squared
+            mov rax, [rbp-32]
+            cmp [rbp-40], rax
+            jge print_space
 
-            # draw_star:
+            # print_star:
+                lea rsi, [star_character]
+                jmp end_print
+            print_space:
+                lea rsi, [space_character]
+            end_print:
 
-                # test if a star should be drawn
-                mov rax, 1
-                mov rdi, 1
-                lea rsi, [star_symbol]
-                mov rdx, 1
-                syscall
-                
-                jmp skip_space
-
-            draw_space:
-
-                mov rax, 1
-                mov rdi, 1
-                lea rsi, [space_symbol]
-                mov rdx, 1
-                syscall
-
-            skip_space:
-
+            # printing the chosen character
             mov rax, 1
             mov rdi, 1
-            lea rsi, [space_symbol]
             mov rdx, 1
             syscall
 
-            # increment the column index variable
-            inc word ptr [rbp-4]
+            # printing a space
+            mov rax, 1
+            mov rdi, 1
+            lea rsi, [space_character]
+            mov rdx, 1
+            syscall
 
-            mov cx, [rect_size]
-            cmp [rbp-4], cx
-            jne column_loop
+            # increment col index var
+            inc qword ptr [rbp-16]
+            # test column loop termination
+            mov rax, [rbp-16]
+            cmp rax, [square_size]
+            jne for_loop_columns
 
-        # print a new line
+        # writing a new line
         mov rax, 1
         mov rdi, 1
         lea rsi, [new_line]
         mov rdx, 1
         syscall
+        
+        # increment col index var
+        inc qword ptr [rbp-8]
+        # test row loop termination
+        mov rax, [rbp-8]
+        cmp rax, [square_size]
+        jne for_loop_rows
 
-        # increment the row index variable
-        inc word ptr [rbp-8]
+    # memory de allocation
+    mov rsp, rbp
 
-        mov cx, [rect_size]
-        cmp [rbp-8], cx
-        jne row_loop
-
-    # exit system call
+    # exit
     mov rax, 60
-    mov rdi, 69
+    mov rdi, 0
     syscall
 
-    mov rsp, rbp
-    pop rbp
+square_size:
+    .quad 20
 
-star_symbol:
+star_character:
     .word '*'
 
-
-
-space_symbol:
+space_character:
     .word ' '
 
 new_line:
     .word '\n'
-
-rect_size:
-    .word 40
-
-diameter:
-    .word 35
-
-# data types: https://software-dl.ti.com/codegen/docs/tiarmclang/compiler_tools_user_guide/gnu_syntax_arm_asm_language/gnu_arm_directives/data_defining_directives.html#gar-data-defining-directives
