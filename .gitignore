@@ -1,8 +1,13 @@
 print_array/call_printf
-print_array/hello_world_func
 print_array/print_array
+
+fibonacci/hello_world_func
+fibonacci/multiply_rec
+fibonacci/fibonacci
+
 draw_square/draw_square
 draw_circle/draw_circle
+draw_circle/draw_circle_improved
 hello_world/hello_world
 sorting/asem
 test

@@ -1,8 +1,8 @@
 .global _start
 .intel_syntax noprefix
 
-# compilation: as draw_circle.s -o draw_circle.o
-# linking: gcc -static -nostdlib draw_circle.o -o draw_circle
+# compilation: as draw_circle_improved.s -o draw_circle_improved.o
+# linking: gcc -static -nostdlib draw_circle_improved.o -o draw_circle_improved
 
 _start:
 
@@ -32,13 +32,13 @@ _start:
     mov [rbp-8], word ptr 0
 
     # loop on the rows
-   row_loop:
+   .L_row_loop:
 
         # column index variable initialized to 0
         mov [rbp-4], word ptr 0
 
         # loop on the columns
-        column_loop:
+        .L_column_loop:
 
             # test if the current character is inside the circle
             mov ax, [rbp-4]
@@ -52,9 +52,9 @@ _start:
             mov ax, [rbp-20]
             cmp ax, [rbp-16]
 
-            jge draw_space
+            jge .L_draw_space
 
-            # draw_star:
+            # .L_draw_star:
 
                 # test if a star should be drawn
                 mov rax, 1
@@ -63,9 +63,9 @@ _start:
                 mov rdx, 1
                 syscall
                 
-                jmp skip_space
+                jmp .L_skip_space
 
-            draw_space:
+            .L_draw_space:
 
                 mov rax, 1
                 mov rdi, 1
@@ -73,7 +73,7 @@ _start:
                 mov rdx, 1
                 syscall
 
-            skip_space:
+            .L_skip_space:
 
             mov rax, 1
             mov rdi, 1
@@ -86,7 +86,7 @@ _start:
 
             mov cx, [rect_size]
             cmp [rbp-4], cx
-            jne column_loop
+            jne .L_column_loop
 
         # print a new line
         mov rax, 1
@@ -100,7 +100,7 @@ _start:
 
         mov cx, [rect_size]
         cmp [rbp-8], cx
-        jne row_loop
+        jne .L_row_loop
 
     # exit system call
     mov rax, 60

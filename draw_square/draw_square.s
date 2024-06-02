@@ -1,4 +1,4 @@
-.global _start, debug
+.global _start
 .intel_syntax noprefix
 
 # compilation: as draw_square.s -o draw_square.o
@@ -8,10 +8,10 @@ _start:
 
 
     mov r9, 0
-    for_loop_rows:    
+    .L_for_loop_rows:    
 
         mov r8, 0
-        for_loop_columns:
+        .L_for_loop_columns:
 
             # printing a star
             mov rax, 1
@@ -29,7 +29,7 @@ _start:
 
             inc r8
             cmp r8, [square_size]
-            jne for_loop_columns
+            jne .L_for_loop_columns
 
         # writing a new line
         mov rax, 1
@@ -40,7 +40,7 @@ _start:
         
         inc r9
         cmp r9, [square_size]
-        jne for_loop_rows
+        jne .L_for_loop_rows
 
     
 

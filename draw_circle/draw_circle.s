@@ -1,8 +1,8 @@
-.global _start, debug
+.global _start
 .intel_syntax noprefix
 
-# compilation: as draw_square.s -o draw_square.o
-# linking: gcc -static -nostdlib draw_square.o -o draw_square
+# compilation: as draw_circle.s -o draw_circle.o
+# linking: gcc -static -nostdlib draw_circle.o -o draw_circle
 
 _start:
 
@@ -27,10 +27,10 @@ _start:
 
 
     mov qword ptr [rbp-8], 0 # row index var is set to 0
-    for_loop_rows:    
+    .L_for_loop_rows:    
 
         mov qword ptr [rbp-16], 0 # col index var is set to 0
-        for_loop_columns:
+        .L_for_loop_columns:
 
             # compute (row_index - square_center)² into distance_squared
             mov rax, [rbp-8]
@@ -47,14 +47,14 @@ _start:
             # compare distance_squared to radius_squared
             mov rax, [rbp-32]
             cmp [rbp-40], rax
-            jge print_space
+            jge .L_print_space
 
-            # print_star:
+            # .L_print_star:
                 lea rsi, [star_character]
-                jmp end_print
-            print_space:
+                jmp .L_end_print
+            .L_print_space:
                 lea rsi, [space_character]
-            end_print:
+            .L_end_print:
 
             # printing the chosen character
             mov rax, 1
@@ -74,7 +74,7 @@ _start:
             # test column loop termination
             mov rax, [rbp-16]
             cmp rax, [square_size]
-            jne for_loop_columns
+            jne .L_for_loop_columns
 
         # writing a new line
         mov rax, 1
@@ -88,7 +88,7 @@ _start:
         # test row loop termination
         mov rax, [rbp-8]
         cmp rax, [square_size]
-        jne for_loop_rows
+        jne .L_for_loop_rows
 
     # memory de allocation
     mov rsp, rbp

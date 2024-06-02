@@ -1,4 +1,4 @@
-.global _start, debug
+.global _start
 .intel_syntax noprefix
 
 # compilation: as hello_world.s -o hello_world.o
@@ -8,7 +8,6 @@ _start:
 
     mov rax, 30
     add rax, 12
-    debug:
 
     mov rax, 1
     mov rdi, 1

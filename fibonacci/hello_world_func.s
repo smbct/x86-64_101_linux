@@ -5,29 +5,16 @@
 # linking: gcc -static -nostdlib hello_world_func.o -o hello_world_func
 
 _print_hello_world:
-
-    # rsp+8 : nb_repeat parameter
-    # rsp : return address
-
-    for_loop_print:
-
-        mov rax, 1
-        mov rdi, 1
-        lea rsi, [hello_world]
-        mov rdx, 14
-        syscall
-
-        mov rax, [rsp+8]
-        dec qword ptr [rsp+8]
-        mov rax, [rsp+8]
-        test rax, rax
-        jnz for_loop_print
+    
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [hello_world]
+    mov rdx, 14
+    syscall
 
     ret
 
 _start:
-
-    push qword ptr 5
 
     _before_call:
     call _print_hello_world
@@ -38,7 +25,7 @@ _start:
 
     # exit
     mov rax, 60
-    mov rdi, 69
+    mov rdi, 0
     syscall
 
 hello_world:
