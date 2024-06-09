@@ -29,18 +29,18 @@ _compute_fibonacci_rec:
 
     # test the index value
     cmp word ptr [rbp-18], 1
-    je if_n_1
-    jg else_n_gt1
+    je .L_if_n_1
+    jg .L_else_n_gt1
     
-    if_n_0: # special case when n is 0, return 0
+    .L_if_n_0: # special case when n is 0, return 0
         mov rax, qword ptr 0
-        jmp end_if_n
+        jmp .L_end_if_n
 
-    if_n_1: # special case when n is 1, return 1
+    .L_if_n_1: # special case when n is 1, return 1
         mov rax, qword ptr 1
-        jmp end_if_n
+        jmp .L_end_if_n
 
-    else_n_gt1: # recursive case : compute f_(n-2) + f_(n-1)
+    .L_else_n_gt1: # recursive case : compute f_(n-2) + f_(n-1)
 
         # compute f_(n-2)
         mov si, [rbp-18]
@@ -59,7 +59,7 @@ _compute_fibonacci_rec:
         add rax, [rbp-16]
         add rax, [rbp-8]
 
-    end_if_n:
+    .L_end_if_n:
 
     mov rsp, rbp
     pop rbp

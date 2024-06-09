@@ -1,14 +1,15 @@
-print_array/call_printf
-print_array/print_array
+pt5_print_array/call_printf
+pt5_print_array/print_array
 
-fibonacci/hello_world_func
-fibonacci/multiply_rec
-fibonacci/fibonacci
+pt4_recursive_power/hello_world_func
+pt4_recursive_power/multiply_rec
 
-draw_square/draw_square
-draw_circle/draw_circle
-draw_circle/draw_circle_improved
-hello_world/hello_world
+pt3_draw_circle/draw_circle
+pt3_draw_circle/draw_circle_improved
+
+pt2_draw_square/draw_square
+pt1_hello_world/hello_world
+
 sorting/asem
 test
 

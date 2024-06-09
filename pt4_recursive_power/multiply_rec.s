@@ -24,13 +24,13 @@ _multiply_rec:
 
     # compare left to 1
     cmp [rbp-8], qword ptr 1
-    jne else_left_not_1
+    jne .L_else_left_not_1
 
-    if_left_1:
+    .L_if_left_1:
         mov rax, [rbp-16]
-        jmp endif
+        jmp .L_endif
 
-    else_left_not_1:
+    .L_else_left_not_1:
         dec qword ptr [rbp-8]
 
         # store the left and right parameters for the next recusrive call
@@ -42,7 +42,7 @@ _multiply_rec:
 
         add rsp, 16
 
-    endif:
+    .L_endif:
 
     add rsp, 16
 

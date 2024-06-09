@@ -1,78 +1,75 @@
-.global main
+.global _start
 .intel_syntax noprefix
 
-# compilation: as pow_rec_alt.s -o pow_rec_alt.o
-# linking: gcc pow_rec_alt.o -o pow_rec_alt
+# compilation: as pow_rec.s -o pow_rec.o
+# linking: gcc -static -nostdlib pow_rec.o -o pow_rec
 
-# rdi : base
-# rsi : exponent
+# rsp + 24 : base
+# rsp + 16 : exponent
 # return : base^exponent in rax
 _pow_rec:
     
     push rbp
     mov rbp, rsp
 
-    sub rsp, 32
+    sub rsp, 16
     # rbp-8 : base (8 bytes)
     # rbp-16 : exponent (8 bytes)
 
-    push rbx
-    push rsi
-
     # store the local variables
-    mov [rbp-8], rdi
-    mov [rbp-16], rsi
+    mov rax, [rbp+24]
+    mov [rbp-8], rax
+    mov rax, [rbp+16]
+    mov [rbp-16], rax
 
     # compare the exponent to 0
     mov rbx, [rbp-16]
     test rbx, rbx
-    jnz .L_else_exponent_not_0
+    jnz else_exponent_not_0
 
     .L_if_exponent_0:
 
         mov rax, 1
-        jmp .L_endif
+        jmp endif
 
     .L_else_exponent_not_0:
 
         dec qword ptr [rbp-16]
 
         # store the left and right parameters for the next recursive call
-        mov rdi, qword ptr [rbp-8]
-        mov rsi, qword ptr [rbp-16]
+        push qword ptr [rbp-8]
+        push qword ptr [rbp-16]
         call _pow_rec
 
         imul rax, [rbp-8] # compute the result
 
+        add rsp, 16
+
     .L_endif:
 
-    pop rsi
-    pop rbx
+    mov rsp, rbp
+    pop rbp
 
-    leave
-    debug2:
     ret
 
-main:
+_start:
 
     push rbp
     mov rbp, rsp
 
-    push rbx
-    push rsi
-
     # pushing the two parameters to the stack -> 5^3
-    mov rdi, qword ptr 5
-    mov rsi, qword ptr 3
+    push qword ptr 5
+    push qword ptr 3
 
     call _pow_rec
-    debug:
+
+    # popping the parameters stored on the stack
+    add rsp, 16
+
+    mov rsp, rbp
+    pop rbp
 
     # exit
-    mov rax, 0
-
-    pop rsi
-    pop rbx
-
-    leave
-    ret
+    mov rax, 60
+    mov rdi, 0
+    syscall
