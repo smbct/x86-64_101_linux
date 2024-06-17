@@ -8,15 +8,15 @@
 # main function (libc main)
 main:
 
-    # storing the rsp value before manipulation
-    push rbp
-    mov rbp, rsp
+    # manual alignment of the stack to 16 bytes by subtracting 8 bytes
+    # since the return address of the main function call is already
+    # on the stack
+    # sub rsp, 8
 
-    # (automatic) 16 bytes alignement of rsp    
-    mov rax, rsp # temporary storing the stack pointer
-    and rax, 15 # computing rsp modulo 15 to compute the misalignement
-    sub rsp, rax # subtrackting byte to align rsp
-    # alternatively, alignement can be simply performed here by : sub rsp, 8
+    # alternatively : automatic 16 bytes alignement of rsp    
+    # mov rax, rsp # temporary storing the stack pointer
+    # and rax, 15 # computing rsp modulo 15 to compute the misalignement
+    # sub rsp, rax # subtracting byte to align rsp
 
     # printing hello_world with a system call
     mov rax, 1
@@ -35,10 +35,9 @@ main:
     lea rdi, [integer_formatter]
     mov rsi, 42
     call printf
-
-    # restoring the rsp value
-    mov rsp, rbp
-    pop rbp
+    
+    # restoring the rsp pointer
+    # add rsp, 8
 
     # return
     mov rax, 0
