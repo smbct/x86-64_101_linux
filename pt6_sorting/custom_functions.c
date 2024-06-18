@@ -10,7 +10,7 @@ void init_array_c(char* array, short length) {
 
 }
 
-void print_array_c(char* array, short length) {
+int print_array_c(char* array, short length) {
     
     for(unsigned int i = 0; i < length; i ++) {
         printf("%d ", array[i]);
@@ -18,6 +18,8 @@ void print_array_c(char* array, short length) {
     }
     
     printf("\n");
+
+    return 42;
 }
 
 void shuffle_array_c(char* array, short length) {
