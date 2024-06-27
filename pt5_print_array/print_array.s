@@ -38,7 +38,7 @@ print_array:
         mov sil, [rsi] # load the value stored at the address
         call printf
 
-        inc byte ptr [rbp-8] # increase the array pointer
+        inc qword ptr [rbp-8] # increase the array pointer
         inc word ptr [rbp-10] # increase the array index
         mov ax, [rbp-10]
         cmp ax, [rbp-12]
