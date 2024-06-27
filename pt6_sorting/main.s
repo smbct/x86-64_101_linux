@@ -1,9 +1,8 @@
 .global main
 .intel_syntax noprefix
 
-# compilation: as main.s -o main.o
-# as print_array.s -o print_array.o
-# linking: gcc print_array.o main.o -static -o main
+# compilation: as main.s -o main.o && as print_array.s -o print_array.o && as copy_array.s -o copy_array.o && as init_array.s -o init_array.o && as selection_sort.s -o selection_sort.o
+# linking: gcc -static main.o print_array.o copy_array.o init_array.o selection_sort.o -o main
 
 # ####################################################################
 # main function (libc main)
