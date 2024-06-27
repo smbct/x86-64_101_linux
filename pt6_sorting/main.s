@@ -63,9 +63,15 @@ main:
     # Init the copy array
 
     # initialize the array
+    # mov rdi, [rbp-8]
+    # mov si, [my_array_length]
+    # call init_array
+
+    # -------------------------------------------------------------
+    # Selection sort of the copy array
     mov rdi, [rbp-8]
     mov si, [my_array_length]
-    call init_array
+    call selection_sort
 
     # -------------------------------------------------------------
     # Print the copy array
@@ -105,6 +111,6 @@ my_array_length:
 new_line:
     .asciz "\n"
 my_array_str:
-    .asciz "My array :      "
+    .asciz "My array :        "
 my_array_copy_str:
-    .asciz "My array copy : "
+    .asciz "My array sorted : "
