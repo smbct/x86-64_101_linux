@@ -19,11 +19,11 @@ main:
     # sub rsp, rax # subtracting byte to align rsp
 
     # printing hello_world with a system call
-    mov rax, 1
-    mov rdi, 1
-    lea rsi, [hello_world]
-    mov rdx, 14
-    syscall
+    # mov rax, 1
+    # mov rdi, 1
+    # lea rsi, [hello_world]
+    # mov rdx, 14
+    # syscall
 
     # printing hello_world with printf
     xor eax, eax
@@ -31,13 +31,13 @@ main:
     call printf
 
     # printing an integer value
-    xor eax, eax
-    lea rdi, [integer_formatter]
-    mov rsi, 42
-    call printf
+    # xor eax, eax
+    # lea rdi, [integer_formatter]
+    # mov rsi, 42
+    # call printf
     
     # restoring the rsp pointer
-    # add rsp, 8
+    add rsp, 8
 
     # return
     mov rax, 0

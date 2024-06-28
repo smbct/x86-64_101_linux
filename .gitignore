@@ -2,3 +2,8 @@
 !*/*.s
 !*/*.c
 !*/Makefile
+
+!**/*.s
+!**/*.c
+!pt8_graphical_mandelbrot/template/*.c
+!pt8_graphical_mandelbrot/template/*.s
