@@ -140,18 +140,19 @@ draw_mandelbrot:
     mov rbp, rsp
 
     # stack allocation
-    sub rsp, 40 # 32 + 8
-
-    # width: rbp-4, 4 bytes
-    # height: rbp-8, 4 bytes
-    # row index: rbp-12, 4 bytes
-    # col index: rbp-16, 4 bytes
-    # x0 mandelbrot: rbp-24, 8 bytes
-    # y0 mandelbrot: rbp-32, 8 bytes
+    sub rsp, 40  # 40
+    # unused: rbp-8, 8 bytes
+    # width: rbp-12, 4 bytes
+    # height: rbp-16, 4 bytes
+    # row index: rbp-20, 4 bytes
+    # col index: rbp-24, 4 bytes
+    # x0 mandelbrot: rbp-32, 8 bytes
+    # y0 mandelbrot: rbp-40, 8 bytes
 
     # store the parameters
-    mov [rbp-4], edi
-    mov [rbp-8], esi
+    mov [rbp-8], rdi
+    mov [rbp-12], edi
+    mov [rbp-16], esi
 
     # preserving registers
 	push rdi
@@ -167,41 +168,41 @@ draw_mandelbrot:
     .L_for_row:
 
         # init y0
-        cvtsi2sd xmm1, dword ptr [rbp-12]
-        dec dword ptr [rbp-8]
-        cvtsi2sd xmm3, dword ptr [rbp-8]
-        inc dword ptr [rbp-8]
+        cvtsi2sd xmm1, dword ptr [rbp-20]
+        dec dword ptr [rbp-16]
+        cvtsi2sd xmm3, dword ptr [rbp-16]
+        inc dword ptr [rbp-16]
         divsd xmm1, xmm3
         movsd xmm3, [rip+max_y]
         subsd xmm3, [rip+min_y]
         mulsd xmm1, xmm3
         addsd xmm1, [rip+min_y]
-        movsd [rbp-32], xmm1
+        movsd [rbp-40], xmm1
 
-        mov [rbp-16], dword ptr 0
+        mov [rbp-24], dword ptr 0
         .L_for_col:
 
             # compute stuff here
 
             # compute x0
-            cvtsi2sd xmm0, dword ptr [rbp-16]
-            dec dword ptr [rbp-4]
-            cvtsi2sd xmm3, dword ptr [rbp-4]
-            inc dword ptr [rbp-4]
+            cvtsi2sd xmm0, dword ptr [rbp-24]
+            dec dword ptr [rbp-12]
+            cvtsi2sd xmm3, dword ptr [rbp-12]
+            inc dword ptr [rbp-12]
             divsd xmm0, xmm3
             movsd xmm3, [rip+max_x]
             subsd xmm3, [rip+min_x]
             mulsd xmm0, xmm3
             addsd xmm0, [rip+min_x]
-            movsd [rbp-24], xmm0
+            movsd [rbp-32], xmm0
 
             
 
             # test the point convergence
             xorps xmm0, xmm0
             xorps xmm1, xmm1
-            movsd xmm0, [rbp-24]
-            movsd xmm1, [rbp-32]
+            movsd xmm0, [rbp-32]
+            movsd xmm1, [rbp-40]
             call test_convergence
 
             # print test
@@ -251,9 +252,9 @@ draw_mandelbrot:
             # mov edx, [rbp-24]
             # call printf
 
-            inc dword ptr [rbp-16]
-            mov eax, [rbp-4]
-            cmp eax, [rbp-16]
+            inc dword ptr [rbp-24]
+            mov eax, [rbp-12]
+            cmp eax, [rbp-24]
             jne .L_for_col
 
         # print a line return
@@ -263,9 +264,9 @@ draw_mandelbrot:
         mov rdx, 1
         syscall
 
-        inc dword ptr [rbp-12]
-        mov eax, [rbp-8]
-        cmp eax, [rbp-12]
+        inc dword ptr [rbp-20]
+        mov eax, [rbp-16]
+        cmp eax, [rbp-20]
         jne .L_for_row
 
     # restoring preserved registers
