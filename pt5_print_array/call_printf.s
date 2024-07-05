@@ -11,7 +11,7 @@ main:
     # manual alignment of the stack to 16 bytes by subtracting 8 bytes
     # since the return address of the main function call is already
     # on the stack
-    # sub rsp, 8
+    sub rsp, 8
 
     # alternatively : automatic 16 bytes alignement of rsp    
     # mov rax, rsp # temporary storing the stack pointer

@@ -1,22 +1,24 @@
-.global _start
+.global main
 .intel_syntax noprefix
 
 # compilation: as main.s -o main.o && as mandelbrot.s -o mandelbrot.o
-# linking: gcc -static -nostdlib main.o mandelbrot.o -o main
+# linking: gcc -static main.o mandelbrot.o -o main
 
 .section .text
 
-_start:
+main:
 
     push rbp
     mov rbp, rsp
+
+    # sub rsp, 8
 
     mov edi, 80
     mov esi, 30
     call draw_mandelbrot    
 
     mov rsp, rbp
-    pop rbp
+    pop rbp    
 
     # exit
     mov rax, 60

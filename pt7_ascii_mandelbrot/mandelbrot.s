@@ -54,11 +54,6 @@ test_convergence:
         movsd xmm1, [rip+double_4_cst]
         comisd xmm0, xmm1
 
-        # printing x and y
-        # mov eax, 2
-        # lea rdi, [rip+formatter5]
-        # call printf
-
         jbe  .L_convergence_not_verified
 
         # .L_convergence_verified:
@@ -96,25 +91,6 @@ test_convergence:
         jne .L_for_conv
 
     .L_end_for:
-
-    # # printing test
-    # xor eax, eax
-    # lea rdi, [rip+new_lines]
-    # call printf
-
-    # xor eax, eax
-    # xor rsi, rsi
-    # mov si, [rbp-44]
-    # lea rdi, [rip+formatter4]
-    # call printf
-    
-
-    # # printing x and y
-    # mov eax, 2
-    # movsd xmm0, [rbp-24]
-    # movsd xmm1, [rbp-32] 
-    # lea rdi, [rip+formatter6]
-    # call printf
 
     # set the return flag
     mov ax, [rbp-46]
@@ -158,12 +134,8 @@ draw_mandelbrot:
 	push rsi
 	push rbx
 
-    # # printing test
-    # xor eax, eax
-    # lea rdi, [rip+text_test]
-    # call printf
 
-    mov [rbp-20], dword ptr 0
+    mov [rbp-12], dword ptr 0
     .L_for_row:
 
         # init y0
@@ -195,7 +167,12 @@ draw_mandelbrot:
             addsd xmm0, [rip+min_x]
             movsd [rbp-24], xmm0
 
-            
+            # print x0 and y0 to debug
+            # mov eax, 2
+            # lea rdi, [rip+formatter]
+            # movsd xmm0, [rbp-24]
+            # movsd xmm1, [rbp-32]
+            # call printf
 
             # test the point convergence
             xorps xmm0, xmm0
@@ -203,13 +180,6 @@ draw_mandelbrot:
             movsd xmm0, [rbp-24]
             movsd xmm1, [rbp-32]
             call test_convergence
-
-            # print test
-            # xor rsi, rsi
-            # mov si, ax
-            # xor eax, eax
-            # lea rdi, [rip+formatter3]
-            # call printf
 
             test ax, ax
             jnz .L_if_not_converge 
@@ -237,19 +207,6 @@ draw_mandelbrot:
                 syscall
 
             .L_end_if_converge:
-
-            # call printf
-            # mov eax, 2
-            # lea rdi, [rip+formatter2]
-            # movsd xmm0, [rbp-32]
-            # movsd xmm1, [rbp-40]
-            # call printf
-
-            # xor eax, eax
-            # lea rdi, [rip+formatter]
-            # mov esi, [rbp-20]
-            # mov edx, [rbp-24]
-            # call printf
 
             inc dword ptr [rbp-16]
             mov eax, [rbp-4]
@@ -287,28 +244,11 @@ space_character:
 new_line:
     .word '\n'
 
-
-text_test:
-	.asciz "test\n"
-
 formatter:
-    .asciz "x, y: %d, %d\n"
-
-formatter2:
     .asciz "float x0, y0: %f, %f\n"
 
-formatter3:
-    .asciz "val ax: %d\n"
-
-formatter4:
-    .asciz "val iter: %d\n"
-
-formatter5:
-    .asciz "float cmp conv: %f, %f\n"
-
-formatter6:
-    .asciz "float x final, y final: %f, %f\n"
-
+formatter2:
+    .asciz "row and col %d %d\n"
 
 new_lines:
     .asciz "\n\n\n"
