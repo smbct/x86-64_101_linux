@@ -1,7 +1,5 @@
-.global draw_mandelbrot
+.global draw_mandelbrot, draw_mandelbrot_color
 .intel_syntax noprefix
-
-.text
 
 # ----------------------------------------------------------
 # test if a point converge in the mandelbrot set
@@ -54,11 +52,6 @@ test_convergence:
         movsd xmm1, [rip+double_4_cst]
         comisd xmm0, xmm1
 
-        # printing x and y
-        # mov eax, 2
-        # lea rdi, [rip+formatter5]
-        # call printf
-
         jbe  .L_convergence_not_verified
 
         # .L_convergence_verified:
@@ -97,25 +90,6 @@ test_convergence:
 
     .L_end_for:
 
-    # printing test
-    xor eax, eax
-    lea rdi, [rip+new_lines]
-    call printf
-
-    xor eax, eax
-    xor rsi, rsi
-    mov si, [rbp-44]
-    lea rdi, [rip+formatter4]
-    call printf
-    
-
-    # printing x and y
-    mov eax, 2
-    movsd xmm0, [rbp-24]
-    movsd xmm1, [rbp-32] 
-    lea rdi, [rip+formatter6]
-    call printf
-
     # set the return flag
     mov ax, [rbp-46]
 
@@ -131,121 +105,111 @@ test_convergence:
 
 
 # ----------------------------------------------------------
-# draw the mandelbrot set
-# rdi: the image ptr (8 bytes)
-# esi: image width
-# edx: image height
+# draw the ascii mandelbrot set
+# edi: width
+# esi: height
+# rdx: sfImage pointer
 draw_mandelbrot:
 
     push rbp
     mov rbp, rsp
 
     # stack allocation
-    sub rsp, 40  # 40
-    # image_ptr: rbp-8, 8 bytes
-    # image width: rbp-12, 4 bytes
-    # image height: rbp-16, 4 bytes
-    # pixel_x_index: rbp-20, 4 bytes
-    # pixel_y_index: rbp-24, 4 bytes
-    # x0 mandelbrot: rbp-32, 8 bytes
-    # y0 mandelbrot: rbp-40, 8 bytes
+    sub rsp, 40 # 32 + 8
+    # width: rbp-4, 4 bytes
+    # height: rbp-8, 4 bytes
+    # row index: rbp-12, 4 bytes
+    # col index: rbp-16, 4 bytes
+    # x0 mandelbrot: rbp-24, 8 bytes
+    # y0 mandelbrot: rbp-32, 8 bytes
+    # image pointer: rbp-40, 8 bytes
 
     # store the parameters
-    mov [rbp-8], rdi
-    mov [rbp-12], esi
-    mov [rbp-16], edx
+    mov [rbp-4], edi
+    mov [rbp-8], esi
+    mov [rbp-40], rdx
 
     # preserving registers
 	push rdi
 	push rsi
 	push rbx
 
-    # # printing test
-    # xor eax, eax
-    # lea rdi, [rip+text_test]
-    # call printf
 
-    mov [rbp-20], dword ptr 0
-    .L_for_x:
+    mov [rbp-12], dword ptr 0
+    .L_for_row:
 
-        # compute x0
-        cvtsi2sd xmm0, dword ptr [rbp-20]
-        dec dword ptr [rbp-12]
-        cvtsi2sd xmm3, dword ptr [rbp-12]
-        inc dword ptr [rbp-12]
-        divsd xmm0, xmm3
-        movsd xmm3, [rip+max_x]
-        subsd xmm3, [rip+min_x]
-        mulsd xmm0, xmm3
-        addsd xmm0, [rip+min_x]
-        movsd [rbp-32], xmm0
+        # init y0
+        cvtsi2sd xmm1, dword ptr [rbp-12]
+        dec dword ptr [rbp-8]
+        cvtsi2sd xmm3, dword ptr [rbp-8]
+        inc dword ptr [rbp-8]
+        divsd xmm1, xmm3
+        movsd xmm3, [rip+max_y]
+        subsd xmm3, [rip+min_y]
+        mulsd xmm1, xmm3
+        addsd xmm1, [rip+min_y]
+        movsd [rbp-32], xmm1
 
-        mov [rbp-24], dword ptr 0
-        .L_for_y:
+        mov [rbp-16], dword ptr 0
+        .L_for_col:
 
             # compute stuff here
 
-            # init y0
-            cvtsi2sd xmm1, dword ptr [rbp-24]
-            dec dword ptr [rbp-16]
-            cvtsi2sd xmm3, dword ptr [rbp-16]
-            inc dword ptr [rbp-16]
-            divsd xmm1, xmm3
-            movsd xmm3, [rip+max_y]
-            subsd xmm3, [rip+min_y]
-            mulsd xmm1, xmm3
-            addsd xmm1, [rip+min_y]
-            movsd [rbp-40], xmm1
+            # compute x0
+            cvtsi2sd xmm0, dword ptr [rbp-16]
+            dec dword ptr [rbp-4]
+            cvtsi2sd xmm3, dword ptr [rbp-4]
+            inc dword ptr [rbp-4]
+            divsd xmm0, xmm3
+            movsd xmm3, [rip+max_x]
+            subsd xmm3, [rip+min_x]
+            mulsd xmm0, xmm3
+            addsd xmm0, [rip+min_x]
+            movsd [rbp-24], xmm0
+
+            # print x0 and y0 to debug
+            # mov eax, 2
+            # lea rdi, [rip+formatter]
+            # movsd xmm0, [rbp-24]
+            # movsd xmm1, [rbp-32]
+            # call printf
 
             # test the point convergence
             xorps xmm0, xmm0
             xorps xmm1, xmm1
-            movsd xmm0, [rbp-32]
-            movsd xmm1, [rbp-40]
+            movsd xmm0, [rbp-24]
+            movsd xmm1, [rbp-32]
             call test_convergence
-
-            # print test
-            # xor rsi, rsi
-            # mov si, ax
-            # xor eax, eax
-            # lea rdi, [rip+formatter3]
-            # call printf
 
             test ax, ax
             jnz .L_if_not_converge 
 
             # .L_if_converge:
 
-                mov rdi, [rbp-8] # image ptr
-                mov esi, [rbp-20] # x coordinate
-                mov edx, [rbp-24] # y coordinate
-                mov ecx,  [rip+color_red] # color red
+                # draw a pixel
+                mov rdi, [rbp-40] # image ptr
+                mov esi, [rbp-16] # x coordinates
+                mov edx, [rbp-12] # y coordinates
+                mov ecx, [rip+color_red] # color
                 call sfImage_setPixel
+
+                jmp .L_end_if_converge
 
             .L_if_not_converge:
 
-            # call printf
-            # mov eax, 2
-            # lea rdi, [rip+formatter2]
-            # movsd xmm0, [rbp-32]
-            # movsd xmm1, [rbp-40]
-            # call printf
+                # do nothing
 
-            # xor eax, eax
-            # lea rdi, [rip+formatter]
-            # mov esi, [rbp-20]
-            # mov edx, [rbp-24]
-            # call printf
+            .L_end_if_converge:
 
-            inc dword ptr [rbp-24]
-            mov eax, [rbp-16]
-            cmp eax, [rbp-24]
-            jne .L_for_y
+            inc dword ptr [rbp-16]
+            mov eax, [rbp-4]
+            cmp eax, [rbp-16]
+            jne .L_for_col
 
-        inc dword ptr [rbp-20]
-        mov eax, [rbp-12]
-        cmp eax, [rbp-20]
-        jne .L_for_x
+        inc dword ptr [rbp-12]
+        mov eax, [rbp-8]
+        cmp eax, [rbp-12]
+        jne .L_for_row
 
     # restoring preserved registers
 	pop rbx
@@ -257,32 +221,143 @@ draw_mandelbrot:
 
     ret
 
-.data
 
-color_red:
-	.byte 255, 0, 0, 255
+# ----------------------------------------------------------
+# draw the ascii mandelbrot set
+# edi: width
+# esi: height
+# rdx: sfImage pointer
+draw_mandelbrot_color:
 
-text_test:
-	.asciz "test\n"
+    push rbp
+    mov rbp, rsp
+
+    # stack allocation
+    sub rsp, 40 # 32 + 8
+    # width: rbp-4, 4 bytes
+    # height: rbp-8, 4 bytes
+    # row index: rbp-12, 4 bytes
+    # col index: rbp-16, 4 bytes
+    # x0 mandelbrot: rbp-24, 8 bytes
+    # y0 mandelbrot: rbp-32, 8 bytes
+    # image pointer: rbp-40, 8 bytes
+
+    # store the parameters
+    mov [rbp-4], edi
+    mov [rbp-8], esi
+    mov [rbp-40], rdx
+
+    # preserving registers
+	push rdi
+	push rsi
+	push rbx
+
+
+    mov [rbp-12], dword ptr 0
+    .L_for_row_2:
+
+        # init y0
+        cvtsi2sd xmm1, dword ptr [rbp-12]
+        dec dword ptr [rbp-8]
+        cvtsi2sd xmm3, dword ptr [rbp-8]
+        inc dword ptr [rbp-8]
+        divsd xmm1, xmm3
+        movsd xmm3, [rip+max_y]
+        subsd xmm3, [rip+min_y]
+        mulsd xmm1, xmm3
+        addsd xmm1, [rip+min_y]
+        movsd [rbp-32], xmm1
+
+        mov [rbp-16], dword ptr 0
+        .L_for_col_2:
+
+            # compute stuff here
+
+            # compute x0
+            cvtsi2sd xmm0, dword ptr [rbp-16]
+            dec dword ptr [rbp-4]
+            cvtsi2sd xmm3, dword ptr [rbp-4]
+            inc dword ptr [rbp-4]
+            divsd xmm0, xmm3
+            movsd xmm3, [rip+max_x]
+            subsd xmm3, [rip+min_x]
+            mulsd xmm0, xmm3
+            addsd xmm0, [rip+min_x]
+            movsd [rbp-24], xmm0
+
+            # print x0 and y0 to debug
+            # mov eax, 2
+            # lea rdi, [rip+formatter]
+            # movsd xmm0, [rbp-24]
+            # movsd xmm1, [rbp-32]
+            # call printf
+
+            # test the point convergence
+            xorps xmm0, xmm0
+            xorps xmm1, xmm1
+            movsd xmm0, [rbp-24]
+            movsd xmm1, [rbp-32]
+            call test_convergence
+
+            test ax, ax
+            jnz .L_if_not_converge_2 
+
+            # .L_if_converge_2:
+
+                # draw a pixel
+                # mov rdi, [rbp-40] # image ptr
+                # mov esi, [rbp-16] # x coordinates
+                # mov edx, [rbp-12] # y coordinates
+                # mov ecx, [rip+color_red] # color
+                # call sfImage_setPixel
+
+                jmp .L_end_if_converge_2
+
+            .L_if_not_converge_2:
+
+                # draw a pixel
+                mov rdi, [rbp-40] # image ptr
+                mov esi, [rbp-16] # x coordinates
+                mov edx, [rbp-12] # y coordinates
+                mov ecx, [rip+color_red] # color
+                call sfImage_setPixel
+
+            .L_end_if_converge_2:
+
+            inc dword ptr [rbp-16]
+            mov eax, [rbp-4]
+            cmp eax, [rbp-16]
+            jne .L_for_col_2
+
+        inc dword ptr [rbp-12]
+        mov eax, [rbp-8]
+        cmp eax, [rbp-12]
+        jne .L_for_row_2
+
+    # restoring preserved registers
+	pop rbx
+	pop rsi
+	pop rdi
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+
+
+star_character:
+    .word '*'
+space_character:
+    .word ' '
+new_line:
+    .word '\n'
 
 formatter:
-    .asciz "x, y: %d, %d\n"
-
-formatter2:
     .asciz "float x0, y0: %f, %f\n"
 
-formatter3:
-    .asciz "val ax: %d\n"
-
-formatter4:
-    .asciz "val iter: %d\n"
-
-formatter5:
-    .asciz "float cmp conv: %f, %f\n"
-
-formatter6:
-    .asciz "float x final, y final: %f, %f\n"
-
+formatter2:
+    .asciz "row and col %d %d\n"
 
 new_lines:
     .asciz "\n\n\n"
@@ -304,3 +379,7 @@ double_4_cst:
     .double 4.
 double_2_cst:
     .double 2.
+
+# color red
+color_red:
+    .byte 255, 0, 0, 255

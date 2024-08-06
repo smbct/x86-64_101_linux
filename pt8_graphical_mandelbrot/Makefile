@@ -23,13 +23,7 @@ test: test.o
 
 
 
-main.o: main.s
-	as -g main.s -c -o main.o
-mandelbrot.o: mandelbrot.s
-	as -g mandelbrot.s -c -o mandelbrot.o
 
-mandelbrot: main.o mandelbrot.o
-	gcc main.o mandelbrot.o -lcsfml-graphics -lcsfml-window -lcsfml-system  -o mandelbrot
 
 #################################################
 
@@ -40,3 +34,36 @@ test_print_float.s: test_print_float.c
 
 test_double_cmp.s: test_double_cmp.c
 	gcc -S test_double_cmp.c -masm=intel -fdiagnostics-color=always -fverbose-asm -o test_double_cmp.s
+
+
+#################################################
+
+hello_sfml: hello_sfml.o
+	gcc hello_sfml.o -lcsfml-graphics -lcsfml-window -lcsfml-system -o hello_sfml
+
+hello_sfml.o: hello_sfml.s
+	as -g hello_sfml.s -c -o hello_sfml.o
+
+create_window_c: create_window_c.o
+	gcc create_window_c.o -lcsfml-graphics -lcsfml-window -lcsfml-system -o create_window_c
+
+create_window_c.o: create_window_c.c
+	gcc create_window_c.c -c -o create_window_c.o
+
+create_window_c.s: create_window_c.c
+	gcc -S create_window_c.c -masm=intel -fdiagnostics-color=always -fverbose-asm -o create_window_c.s
+
+create_window_assembly: create_window_assembly.o
+	gcc create_window_assembly.o -lcsfml-graphics -lcsfml-window -lcsfml-system -o create_window_assembly
+
+create_window_assembly.o: create_window_assembly.s
+	as -g create_window_assembly.s -c -o create_window_assembly.o
+
+draw_mandelbrot.o: draw_mandelbrot.s
+	as -g draw_mandelbrot.s -c -o draw_mandelbrot.o
+
+mandelbrot.o: mandelbrot.s
+	as -g mandelbrot.s -c -o mandelbrot.o
+
+mandelbrot: draw_mandelbrot.o mandelbrot.o
+	gcc draw_mandelbrot.o mandelbrot.o -lcsfml-graphics -lcsfml-window -lcsfml-system -o mandelbrot
