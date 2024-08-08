@@ -43,7 +43,7 @@ main:
    mov edi, [rip+window_width]
    mov esi, [rip+window_height]
    mov rdx, [rbp-16] # image pointer
-   call draw_mandelbrot_color
+   call draw_mandelbrot
 
     # texture creation
     mov rdi, [rbp-16] # image ptr
