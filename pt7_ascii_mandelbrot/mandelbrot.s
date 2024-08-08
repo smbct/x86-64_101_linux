@@ -51,7 +51,7 @@ test_convergence:
         mulsd xmm1, xmm1
         addsd xmm0, xmm1
 
-        movsd xmm1, [rip+double_4_cst]
+        movsd xmm1, [double_4_cst]
         comisd xmm0, xmm1
 
         jbe  .L_convergence_not_verified
@@ -74,7 +74,7 @@ test_convergence:
         addsd xmm0, [rbp-8] # xmm0 = x*x-y*y + x0
         movsd [rbp-40], xmm0 # store xtemp = xmm0 = x*x-y*y + x0
 
-        movsd xmm0, [rip+double_2_cst] # xmm0 = 2
+        movsd xmm0, [double_2_cst] # xmm0 = 2
         mulsd xmm0, [rbp-24] # xmm0 = 2*x
         mulsd xmm0, [rbp-32] # xmm0 = 2*x*y
         addsd xmm0, [rbp-16] # xmm0 = 2*x*y + y0
@@ -86,7 +86,7 @@ test_convergence:
         
         # increase the iteration variable and test for the loop termination
         inc dword ptr [rbp-44]
-        mov eax, [rip+max_iteration]
+        mov eax, [max_iteration]
         cmp eax, [rbp-44]
         jne .L_for_conv
 
@@ -144,10 +144,10 @@ draw_mandelbrot:
         cvtsi2sd xmm3, dword ptr [rbp-8]
         inc dword ptr [rbp-8]
         divsd xmm1, xmm3
-        movsd xmm3, [rip+max_y]
-        subsd xmm3, [rip+min_y]
+        movsd xmm3, [max_y]
+        subsd xmm3, [min_y]
         mulsd xmm1, xmm3
-        addsd xmm1, [rip+min_y]
+        addsd xmm1, [min_y]
         movsd [rbp-32], xmm1
 
         mov [rbp-16], dword ptr 0
@@ -161,15 +161,15 @@ draw_mandelbrot:
             cvtsi2sd xmm3, dword ptr [rbp-4]
             inc dword ptr [rbp-4]
             divsd xmm0, xmm3
-            movsd xmm3, [rip+max_x]
-            subsd xmm3, [rip+min_x]
+            movsd xmm3, [max_x]
+            subsd xmm3, [min_x]
             mulsd xmm0, xmm3
-            addsd xmm0, [rip+min_x]
+            addsd xmm0, [min_x]
             movsd [rbp-24], xmm0
 
             # print x0 and y0 to debug
             # mov eax, 2
-            # lea rdi, [rip+formatter]
+            # lea rdi, [formatter]
             # movsd xmm0, [rbp-24]
             # movsd xmm1, [rbp-32]
             # call printf
